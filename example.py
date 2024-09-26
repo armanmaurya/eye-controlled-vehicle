@@ -4,9 +4,9 @@ Check the README.md for complete documentation.
 """
 
 import cv2
-from gaze_tracking import GazeTracking
+from custom_gaze import CustomTracking
 
-gaze = GazeTracking()
+gaze = CustomTracking()
 webcam = cv2.VideoCapture(0)
 
 while True:
