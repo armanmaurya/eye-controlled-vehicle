@@ -5,6 +5,7 @@ Check the README.md for complete documentation.
 
 import cv2
 from custom_gaze import CustomTracking
+import datetime
 
 gaze = CustomTracking()
 webcam = cv2.VideoCapture(0)
@@ -19,8 +20,10 @@ while True:
     frame = gaze.annotated_frame()
     text = ""
 
-    if gaze.is_blinking():
+    if gaze.isBlinked():
         text = "Blinking"
+        print(datetime.datetime.now(),"Blinked")
+        print(gaze.blink_count, "number fo bliks")
     elif gaze.is_right():
         text = "Looking right"
     elif gaze.is_left():
