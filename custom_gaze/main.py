@@ -24,7 +24,7 @@ class CustomTracking(GazeTracking):
                 return True
             self.frames_below_thresh = 0
 
-        # print(self.frames_below_thresh)
+        print(self.frames_below_thresh)
         return False
             
         

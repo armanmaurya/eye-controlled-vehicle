@@ -43,6 +43,7 @@ class GazeTracking(object):
         """Detects the face and initialize Eye objects"""
         frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
         faces = self._face_detector(frame)
+        self.faces = faces
 
         try:
             landmarks = self._predictor(frame, faces[0])
@@ -99,12 +100,12 @@ class GazeTracking(object):
     def is_right(self):
         """Returns true if the user is looking to the right"""
         if self.pupils_located:
-            return self.horizontal_ratio() <= 0.35
+            return self.horizontal_ratio() <= 0.4
 
     def is_left(self):
         """Returns true if the user is looking to the left"""
         if self.pupils_located:
-            return self.horizontal_ratio() >= 0.65
+            return self.horizontal_ratio() >= 0.8
 
     def is_center(self):
         """Returns true if the user is looking to the center"""
@@ -120,7 +121,7 @@ class GazeTracking(object):
     def annotated_frame(self):
         """Returns the main frame with pupils highlighted"""
         frame = self.frame.copy()
-
+        
         if self.pupils_located:
             color = (0, 255, 0)
             x_left, y_left = self.pupil_left_coords()
@@ -129,5 +130,12 @@ class GazeTracking(object):
             cv2.line(frame, (x_left, y_left - 5), (x_left, y_left + 5), color)
             cv2.line(frame, (x_right - 5, y_right), (x_right + 5, y_right), color)
             cv2.line(frame, (x_right, y_right - 5), (x_right, y_right + 5), color)
+            # Draw rectangle around the face
+
+            for face in self.faces:
+                face_rect = [(face.left(), face.top()), (face.right(), face.bottom())]
+                top_left = face_rect[0]
+                bottom_right = face_rect[1]
+                cv2.rectangle(frame, top_left, bottom_right, color, 2)
 
         return frame
