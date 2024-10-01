@@ -12,15 +12,24 @@ class CustomTracking(GazeTracking):
         super().__init__()
         self.blink_count = 0
         self.frames_below_thresh = 0
+        self.last_blink_time = datetime.datetime.now()
+        self.blink_reset_threshold = datetime.timedelta(seconds=1)  # Reset threshold time
         
 
     def isBlinked(self):
+        current_time = datetime.datetime.now()
+
+        # Reset blink count if time since last blink exceeds threshold
+        if current_time - self.last_blink_time > self.blink_reset_threshold:
+            self.blink_count = 0
+
         if self.is_blinking():
             self.frames_below_thresh += 1
         else:
-            if self.frames_below_thresh >= 3:
+            if self.frames_below_thresh <= 5 and self.frames_below_thresh > 0:
                 self.blink_count +=1
                 self.frames_below_thresh = 0
+                self.last_blink_time = current_time  # Update last blink time
                 return True
             self.frames_below_thresh = 0
 
