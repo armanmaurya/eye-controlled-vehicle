@@ -44,9 +44,14 @@ class GazeTracking(object):
         frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
         faces = self._face_detector(frame)
         self.faces = faces
-
+        # print(faces)
         try:
             landmarks = self._predictor(frame, faces[0])
+            # Print all landmarks
+            # for n in range(0, 68):
+            #     x = landmarks.part(n).x
+            #     y = landmarks.part(n).y
+            #     print(f"Landmark {n}: ({x}, {y})")
             self.eye_left = Eye(frame, landmarks, 0, self.calibration)
             self.eye_right = Eye(frame, landmarks, 1, self.calibration)
 
@@ -86,6 +91,7 @@ class GazeTracking(object):
             pupil_left = self.eye_left.pupil.x / (self.eye_left.center[0] * 2 - 10)
             pupil_right = self.eye_right.pupil.x / (self.eye_right.center[0] * 2 - 10)
             return (pupil_left + pupil_right) / 2
+        
 
     def vertical_ratio(self):
         """Returns a number between 0.0 and 1.0 that indicates the
@@ -100,6 +106,7 @@ class GazeTracking(object):
     def is_right(self):
         """Returns true if the user is looking to the right"""
         if self.pupils_located:
+            # print(self.horizontal_ratio())
             return self.horizontal_ratio() <= 0.4
 
     def is_left(self):
@@ -116,14 +123,14 @@ class GazeTracking(object):
         """Returns true if the user closes his eyes"""
         if self.pupils_located:
             blinking_ratio = (self.eye_left.blinking + self.eye_right.blinking) / 2
-            return blinking_ratio > 4.5
+            return blinking_ratio > 5
 
     def annotated_frame(self):
         """Returns the main frame with pupils highlighted"""
         frame = self.frame.copy()
         
+        color = (0, 255, 0)
         if self.pupils_located:
-            color = (0, 255, 0)
             x_left, y_left = self.pupil_left_coords()
             x_right, y_right = self.pupil_right_coords()
             cv2.line(frame, (x_left - 5, y_left), (x_left + 5, y_left), color)
@@ -132,10 +139,24 @@ class GazeTracking(object):
             cv2.line(frame, (x_right, y_right - 5), (x_right, y_right + 5), color)
             # Draw rectangle around the face
 
-            for face in self.faces:
-                face_rect = [(face.left(), face.top()), (face.right(), face.bottom())]
-                top_left = face_rect[0]
-                bottom_right = face_rect[1]
-                cv2.rectangle(frame, top_left, bottom_right, color, 2)
+        # for face in self.faces:
+        #     face_rect = [(face.left(), face.top()), (face.right(), face.bottom())]
+        #     top_left = face_rect[0]
+        #     bottom_right = face_rect[1]
+        #     cv2.rectangle(frame, top_left, bottom_right, color, 2)
+
+        if (self.faces):
+            # Annotate all landmarks
+            landmarks = self._predictor(cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY), self.faces[0])
+            for n in range(0, 68):
+                x = landmarks.part(n).x
+                y = landmarks.part(n).y
+                cv2.circle(frame, (x, y), 2, (0, 0, 255), -1)  # Red color for landmarks
+
+        # Annotate the iris frame of the left eye
+        if self.eye_left and self.eye_left.pupil and self.eye_left.pupil.iris_frame is not None:
+            iris_frame_bgr = cv2.cvtColor(self.eye_left.pupil.iris_frame, cv2.COLOR_GRAY2BGR)
+            h, w = iris_frame_bgr.shape[:2]
+            frame[0:h, 0:w] = iris_frame_bgr
 
         return frame

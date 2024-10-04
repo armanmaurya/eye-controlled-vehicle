@@ -89,7 +89,6 @@ class Eye(object):
             ratio = eye_width / eye_height
         except ZeroDivisionError:
             ratio = None
-
         return ratio
 
     def _analyze(self, original_frame, landmarks, side, calibration):

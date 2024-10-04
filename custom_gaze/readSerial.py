@@ -3,7 +3,7 @@ import time
 
 while True:
     try:
-        ser = serial.Serial('/dev/ttyUSB0', 9600)
+        ser = serial.Serial('COM5', 9600)
         print("Device connected successfully.")
         break
     except serial.SerialException as e:
