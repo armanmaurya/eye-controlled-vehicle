@@ -52,17 +52,24 @@ def main():
             frame = gaze.annotated_frame()
             text = ""
 
-            if gaze.isBlinked() and gaze.blink_count == 2:
+            gaze.DetectBlink()
+
+            if gaze.final_blink_count == 2:
                 text = "Blinking"
-                if gaze.is_right():
-                    print("Going right")
-                    wheelChair.rotateRight()
-                elif gaze.is_left():
-                    print("Going left")
-                    wheelChair.rotateLeft()
-                elif gaze.is_center():
+                # if gaze.is_right():
+                #     print("Going right")
+                #     wheelChair.rotateRight()
+                # elif gaze.is_left():
+                #     print("Going left")
+                #     wheelChair.rotateLeft()
+                if gaze.is_center():
+                    gaze.final_blink_count = 0
                     print("Going Forward")
                     wheelChair.toggleMoving()
+            elif gaze.final_blink_count == 3:
+                print("Going Backward")
+                gaze.final_blink_count = 0
+                wheelChair.moveBackward()
 
             if gaze.is_left():
                 if wheelChair.isRotating == False:

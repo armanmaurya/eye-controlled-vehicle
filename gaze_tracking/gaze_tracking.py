@@ -121,7 +121,8 @@ class GazeTracking(object):
 
     def is_blinking(self):
         """Returns true if the user closes his eyes"""
-        if self.pupils_located:
+        # if self.pupils_located:
+        if (self.eye_left and self.eye_right):
             blinking_ratio = (self.eye_left.blinking + self.eye_right.blinking) / 2
             return blinking_ratio > 5
 

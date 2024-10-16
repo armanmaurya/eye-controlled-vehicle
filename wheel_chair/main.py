@@ -19,6 +19,10 @@ class WheelChair:
             self.ser.write(b'1')
             self.isMoving = True
 
+    def moveBackward(self):
+        self.ser.write(b'4')
+        self.isMoving = True
+
     def rotateRight(self):
         self.isRotating = True
         self.ser.write(b'3')
@@ -32,7 +36,7 @@ class WheelChair:
         self.isMoving = False
         self.isRotating = False
 
-    def connect_serial(self, port='COM5', baudrate=9600):
+    def connect_serial(self, port='COM9', baudrate=9600):
         """Attempts to connect to the serial device."""
         while True:
             try:
